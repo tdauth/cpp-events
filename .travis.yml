@@ -1,0 +1,36 @@
+dist: xenial
+sudo: required
+os: linux
+language: cpp
+
+script:
+  # Use GCC 8 to support C++17
+  - sudo ln -sf /usr/bin/cc-8 /usr/bin/cc
+  - sudo ln -sf /usr/bin/c++-8 /usr/bin/c++
+  - sudo ln -sf /usr/bin/gcc-8 /usr/bin/gcc
+  - sudo ln -sf /usr/bin/gcc-ar-8 /usr/bin/gcc-ar
+  - sudo ln -sf /usr/bin/gcc-nm-8 /usr/bin/gcc-nm
+  - sudo ln -sf /usr/bin/gcc-ranlib-8 /usr/bin/gcc-ranlib
+  - sudo ln -sf /usr/bin/g++-8 /usr/bin/g++
+  - sudo ln -sf /usr/bin/gcov-8 /usr/bin/gcov
+  - sudo ln -sf /usr/bin/gcov-dump-8 /usr/bin/gcov-dump
+  - sudo ln -sf /usr/bin/gcov-tool-8 /usr/bin/gcov-tool
+  # Check versions
+  - gcc -v && g++ -v && gcov -v && lcov -v && cmake --version
+  - bash ./build.sh
+
+addons:
+  apt:
+    sources:
+      - sourceline: 'ppa:mhier/libboost-latest'
+      - ubuntu-toolchain-r-test
+      - george-edison55-precise-backports
+    update: true
+    packages:
+      - gcc-8
+      - g++-8
+      - boost1.67
+      - cmake-data
+      - cmake
+      - valgrind
+      - lcov

@@ -1,0 +1,5 @@
+/build
+/build_coverage
+/*.kdev4
+/.idea
+/cmake-build-debug
