@@ -16,11 +16,12 @@ int main() {
     auto e = c.send("Hello world!");
     
     e.sync();
-  }
+  });
   
   auto e = c.receive();
   e.sync();
   
+  t1.join();
   
   return 0;
 }

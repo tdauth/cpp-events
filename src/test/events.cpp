@@ -4,8 +4,19 @@
 
 #include "../channel.hpp"
 
-BOOST_AUTO_TEST_CASE(UnbufferedChannelString)
+BOOST_AUTO_TEST_CASE(ChannelString)
 {
-	events::Channel<std::string> c(0);
-	// TODO Complete the test
+	events::Channel<std::string> c;
+	
+    // Thread 1
+	std::thread t1([&c] {
+		auto e = c.send("Hello world!");
+    
+		e.sync();
+	});
+  
+	auto e = c.receive();
+	e.sync();
+    
+    t1.join();
 }

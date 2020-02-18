@@ -10,34 +10,48 @@ template <typename T>
 class Event
 {
 public:
-    Event();
-    T sync() {
-        return mvar.take();
+    Event() {
     }
     
-    void sync(T &&v) {
-        mvar.put(std::move(v));
+    Event(const Event &other) : mvar(other.mvar) {
+    }
+    
+    T sync() {
+        return mvar->take();
+    }
+    
+    void notify(T &&v) {
+        mvar->put(std::move(v));
     }
     
 private:
-    mvar::MVar<T> mvar;
+    using MVarPtr = std::shared_ptr<mvar::MVar<T>>;
+    
+    MVarPtr mvar;
 };
 
 template <>
 class Event<void>
 {
 public:
-    Event();
-    void syncReceive() {
-        return mvar.take();
+    Event() {
     }
     
-    void syncSend() {
-        mvar.put();
+    Event(const Event &other) : mvar(other.mvar) {
+    }
+    
+    void sync() {
+        return mvar->take();
+    }
+    
+    void notify() {
+        mvar->put();
     }
     
 private:
-    mvar::MVar<void> mvar;
+    using MVarPtr = std::shared_ptr<mvar::MVar<void>>;
+    
+    MVarPtr mvar;
 };
     
 } // namespace events

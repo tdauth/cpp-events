@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 
 project(cpp-events)
 
@@ -19,4 +19,5 @@ find_package(Boost REQUIRED)
 include_directories("${cpp_mvar_INCLUDE_DIR}" ${Boost_INCLUDE_DIR})
 
 add_executable(events src/test/events.cpp)
+target_link_libraries(events ${Boost_LIBRARIES} pthread)
 add_test(EventsTest events)
