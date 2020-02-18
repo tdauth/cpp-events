@@ -8,6 +8,7 @@ include(ExternalProject)
 
 ExternalProject_Add(cpp-mvar
     GIT_REPOSITORY https://github.com/tdauth/cpp-mvar.git
+    INSTALL_COMMAND ""
 )
 
 set(cpp_mvar_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/cpp-mvar-prefix/src/cpp-mvar/src/")
