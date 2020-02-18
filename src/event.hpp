@@ -20,6 +20,7 @@ public:
         return mvar->take();
     }
     
+    // TODO Should be package private.
     void notify(T &&v) {
         mvar->put(std::move(v));
     }
@@ -44,6 +45,7 @@ public:
         return mvar->take();
     }
     
+    // TODO Should be package private.
     void notify() {
         mvar->put();
     }
@@ -53,6 +55,31 @@ private:
     
     MVarPtr mvar;
 };
+
+template<typename T>
+Event<T> always(T &&v) {
+    Event<T> event;
+    event.notify(std::move(v));
+    
+    return event;
+}
+
+Event<void> always() {
+    Event<void> event;
+    event.notify();
+    
+    return event;
+}
+
+template<typename T>
+Event<T> never() {
+    return Event<T>();
+}
+
+template<>
+Event<void> never<void>() {
+    return Event<void>();
+}
     
 } // namespace events
 
