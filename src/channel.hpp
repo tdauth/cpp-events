@@ -15,6 +15,10 @@ public:
     Channel() {
     }
     
+    Channel(Channel &&other) = default;
+    Channel(const Channel &other) = delete;
+    Channel& operator=(const Channel &other) = delete;
+    
     Event<void> send(T &&v) {
         SenderPtr sender = std::make_shared<Sender>(std::move(v));
         
@@ -26,6 +30,7 @@ public:
             
             this->m.put(std::move(sender)); // TODO Allow a copy constructor here
         });
+        t.detach();
         
         return sender->e;
     }
@@ -43,6 +48,7 @@ public:
             receiver->e.notify(std::move(sender->value));
             sender->e.notify();
         });
+        t.detach();
         
         return receiver->e;
     }
