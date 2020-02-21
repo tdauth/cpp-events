@@ -45,7 +45,9 @@ BOOST_AUTO_TEST_CASE(ChannelStringClosed)
 
 BOOST_AUTO_TEST_CASE(EventAlways)
 {
-	events::Event<std::string> a = events::always<std::string>("Hello world!");
+	events::Event<std::string> e1 = events::always<std::string>("Hello world!");
+    BOOST_REQUIRE_EQUAL(e1.sync(), "Hello world!");
     
-    BOOST_REQUIRE_EQUAL(a.sync(), "Hello world!");
+    events::Event<void> e2 = events::always();
+    e2.sync();
 }
