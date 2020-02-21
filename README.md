@@ -3,7 +3,13 @@
 [![Build Status](https://travis-ci.org/tdauth/cpp-events.svg?branch=master)](https://travis-ci.org/tdauth/cpp-events)
 [![Code Coverage](https://img.shields.io/codecov/c/github/tdauth/cpp-events/master.svg)](https://codecov.io/github/tdauth/cpp-events?branch=master)
 
-CML-style events for C++.
+C++ header-only library which provides CML-style events.
+
+CML-style events allow the synchronization of values via channels.
+Events are first-class values which means they can be passed around.
+Only an explicit `sync` call is blocking.
+
+The following example shows how a string value is synchronized between two threads:
 
 ```cpp
 #include <channel.hpp>
