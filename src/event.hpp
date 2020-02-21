@@ -10,23 +10,24 @@ template <typename T>
 class Event
 {
 public:
-    Event() {
+    Event() : mvar(std::make_shared<MVar>()) {
     }
     
     Event(const Event &other) : mvar(other.mvar) {
     }
     
-    T sync() {
-        return mvar->take();
+    const T& sync() {
+        return mvar->read();
     }
     
     // TODO Should be package private.
     void notify(T &&v) {
-        mvar->put(std::move(v));
+        mvar->tryPut(std::move(v));
     }
     
 private:
-    using MVarPtr = std::shared_ptr<mvar::MVar<T>>;
+    using MVar = mvar::MVar<T>;
+    using MVarPtr = std::shared_ptr<MVar>;
     
     MVarPtr mvar;
 };
@@ -35,23 +36,24 @@ template <>
 class Event<void>
 {
 public:
-    Event() {
+    Event() : mvar(std::make_shared<MVar>()) {
     }
     
     Event(const Event &other) : mvar(other.mvar) {
     }
     
     void sync() {
-        return mvar->take();
+        mvar->read();
     }
     
     // TODO Should be package private.
     void notify() {
-        mvar->put();
+        mvar->tryPut();
     }
     
 private:
-    using MVarPtr = std::shared_ptr<mvar::MVar<void>>;
+    using MVar = mvar::MVar<void>;
+    using MVarPtr = std::shared_ptr<MVar>;
     
     MVarPtr mvar;
 };

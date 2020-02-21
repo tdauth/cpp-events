@@ -39,7 +39,7 @@ lcov --remove my_prog.info '/usr/include/*' '/usr/lib/*' '*$BUILD_DIR/*' '*/src/
 # Generate coverage HTML output:
 genhtml --output-directory coverage \
   --demangle-cpp --num-spaces 2 --sort \
-  --title "MVar Test Coverage" \
+  --title "Events Test Coverage" \
   --function-coverage --branch-coverage --legend \
   my_prog_filtered.info
 
