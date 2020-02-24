@@ -60,17 +60,17 @@ int main() {
   events::Channel<std::string> c2;
   
   // Thread 1
-  std::thread t1([&c] {
+  std::thread t1([&c1] {
     c1.sendEvt("A").sync();
   });
   
   // Thread 2
-  std::thread t2([&c] {
+  std::thread t2([&c2] {
     c2.sendEvt("B").sync();
   });
   
   // Thread 3
-  std::thread t3([&c] {
+  std::thread t3([&c1, &c2] {
     auto e1 = c1.recvEvt();
     auto e2 = c2.recvEvt();
     auto e3 = e1.choose(e2);
