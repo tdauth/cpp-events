@@ -21,7 +21,7 @@ int main() {
   
   // Thread 1
   std::thread t1([&c] {
-    auto e = c.send("Hello world!");
+    auto e = c.sendEvt("Hello world!");
     
     bool successful = e.sync();
     
@@ -30,20 +30,74 @@ int main() {
     }
   });
   
-  auto e = c.recv();
-  std::optional<std::string> result = e.sync();
+  // Thread 2
+  std::thread t2([&c] {
+    auto e = c.recvEvt();
+    std::optional<std::string> result = e.sync();
   
-  if (result.has_value()) {
-    std::cout << result.value();
-  } else {
-    std::cerr << "Channel has been closed." << std::endl;
-  }
+    if (result.has_value()) {
+      std::cout << result.value();
+    } else {
+      std::cerr << "Channel has been closed." << std::endl;
+    }
+  });
   
   t1.join();
+  t2.join();
   
   return 0;
 }
 ```
+
+Events allow you to use more advanced combinators.
+The following example shows how we choose the first synchronized event from two different channels and wrap its result to a string which is printed to the standard output:
+
+```cpp
+#include <channel.hpp>
+
+int main() {
+  events::Channel<std::string> c1;
+  events::Channel<std::string> c2;
+  
+  // Thread 1
+  std::thread t1([&c] {
+    c1.sendEvt("A").sync();
+  });
+  
+  // Thread 2
+  std::thread t2([&c] {
+    c2.sendEvt("B").sync();
+  });
+  
+  // Thread 3
+  std::thread t3([&c] {
+    auto e1 = c1.recvEvt();
+    auto e2 = c2.recvEvt();
+    auto e3 = e1.choose(e2);
+    auto e4 = e3.wrap<std::string>([] (const std::optional<std::string> &v) {
+      if (v.has_value()) {
+        return "Result: " + v;
+      }
+      else {
+        return "Channel has been closed.";
+      }
+    });
+    
+    std::cout << e4.sync() << std::endl;
+  });
+  
+  t1.join();
+  t2.join();
+  t3.join();
+  
+  return 0;
+}
+```
+
+## Implementation
+
+The current implementation is based on [MVars](https://github.com/tdauth/cpp-mvar).
+
 
 ## Related Work
 

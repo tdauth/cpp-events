@@ -37,6 +37,25 @@ class Event
 		return e;
 	}
 
+	Event<T> choose(Event<T> other)
+	{
+		Event<T> e;
+
+		std::thread t1([this, &e]() mutable {
+			auto result = this->sync();
+			e.notify(std::move(result));
+		});
+		t1.detach();
+
+		std::thread t2([other, &e]() mutable {
+			auto result = other.sync();
+			e.notify(std::move(result));
+		});
+		t2.detach();
+
+		return e;
+	}
+
 	// TODO Should be package private.
 	void notify(T &&v)
 	{
@@ -77,6 +96,25 @@ class Event<void>
 			e.notify(callback());
 		});
 		t.detach();
+
+		return e;
+	}
+
+	Event<void> choose(Event<void> other)
+	{
+		Event<void> e;
+
+		std::thread t1([this, &e]() mutable {
+			this->sync();
+			e.notify();
+		});
+		t1.detach();
+
+		std::thread t2([other, &e]() mutable {
+			other.sync();
+			e.notify();
+		});
+		t2.detach();
 
 		return e;
 	}
