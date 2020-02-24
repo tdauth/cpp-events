@@ -6,10 +6,12 @@
 C++ header-only library which provides CML-style events.
 
 CML-style events allow the synchronization of values via channels.
-Events are first-class values which means they can be passed around.
+Events are first-class values which are returned by non-blocking send and receive operations.
 Only an explicit `sync` call is blocking.
+Channels can be closed which prevents any further send and receive operations.
+The operations always return a flag which indicates whether the channel has already been closed (similar to Go).
 
-The following example shows how a string value is synchronized between two threads:
+The following example shows how a string value is synchronized between two threads using events:
 
 ```cpp
 #include <channel.hpp>
@@ -21,11 +23,21 @@ int main() {
   std::thread t1([&c] {
     auto e = c.send("Hello world!");
     
-    e.sync();
+    bool successful = e.sync();
+    
+    if (!successful) {
+      std::cerr << "Channel has been closed." << std::endl;
+    }
   });
   
-  auto e = c.receive();
-  e.sync();
+  auto e = c.recv();
+  std::optional<std::string> result = e.sync();
+  
+  if (result.has_value()) {
+    std::cout << result.value();
+  } else {
+    std::cerr << "Channel has been closed." << std::endl;
+  }
   
   t1.join();
   
