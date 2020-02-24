@@ -33,7 +33,15 @@ public:
     Channel(const Channel &) = delete;
     Channel& operator=(const Channel &) = delete;
     
-    Event<SendResult> send(T &&v) {
+    SendResult send(T &&v) {
+        return sendEvt(std::move(v)).sync();
+    }
+    
+    ReceiveResult recv() {
+        return recvEvt().sync();
+    }
+    
+    Event<SendResult> sendEvt(T &&v) {
         SenderPtr sender = std::make_shared<Sender>(std::move(v));
         
         std::thread t([sender, this]() mutable {
@@ -57,7 +65,7 @@ public:
         return sender->e;
     }
     
-    Event<ReceiveResult> receive() {
+    Event<ReceiveResult> recvEvt() {
         ReceiverPtr receiver = std::make_shared<Receiver>();
          
         std::thread t([receiver, this]() mutable {

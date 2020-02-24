@@ -10,14 +10,14 @@ BOOST_AUTO_TEST_CASE(ChannelString)
 	
     // Thread 1
 	std::thread t1([&c] {
-		auto e = c.send("Hello world!");
+		auto e = c.sendEvt("Hello world!");
     
         bool result = e.sync();
         
         BOOST_REQUIRE(result);
 	});
   
-	auto e = c.receive();
+	auto e = c.recvEvt();
 	const std::optional<std::string> &result = e.sync();
     
     BOOST_REQUIRE(result.has_value());
@@ -32,13 +32,13 @@ BOOST_AUTO_TEST_CASE(ChannelStringClosed)
 	c.close();
     
     
-    auto e1 = c.receive();
+    auto e1 = c.recvEvt();
     const std::optional<std::string> &result1 = e1.sync();
     
     BOOST_REQUIRE(!result1.has_value());
     
     
-    auto e2 = c.send("Hello world!");
+    auto e2 = c.sendEvt("Hello world!");
     bool result2 = e2.sync();
     BOOST_REQUIRE(!result2);
 }
