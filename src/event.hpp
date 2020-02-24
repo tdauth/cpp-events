@@ -20,6 +20,19 @@ public:
         return mvar->read();
     }
     
+    template<typename S>
+    Event<S> wrap(std::function<S(const T &)> &&callback) {
+        Event<S> e;
+        
+        std::thread t([this, callback = std::move(callback), &e] () mutable {
+            auto result = this->sync();
+            e.notify(callback(result));
+        });
+        t.detach();
+        
+        return e;
+    }
+    
     // TODO Should be package private.
     void notify(T &&v) {
         mvar->tryPut(std::move(v));
@@ -44,6 +57,19 @@ public:
     
     void sync() {
         mvar->read();
+    }
+    
+    template<typename S>
+    Event<S> wrap(std::function<S()> &&callback) {
+        Event<S> e;
+        
+        std::thread t([this, callback = std::move(callback), &e] () mutable {
+            this->sync();
+            e.notify(callback());
+        });
+        t.detach();
+        
+        return e;
     }
     
     // TODO Should be package private.

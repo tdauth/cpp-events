@@ -51,3 +51,19 @@ BOOST_AUTO_TEST_CASE(EventAlways)
     events::Event<void> e2 = events::always();
     e2.sync();
 }
+
+BOOST_AUTO_TEST_CASE(EventWrap)
+{
+	events::Event<std::string> e1 = events::always<std::string>("Hello world!");
+    events::Event<std::string> e2 = e1.wrap<std::string>([] (const std::string &v) {
+        return v + " It is a great day!";
+    });
+    BOOST_REQUIRE_EQUAL(e2.sync(), "Hello world! It is a great day!");
+    
+    
+    events::Event<void> e3 = events::always();
+    events::Event<std::string> e4 = e3.wrap<std::string>([] {
+        return "It is a great day!";
+    });
+    BOOST_REQUIRE_EQUAL(e4.sync(), "It is a great day!");
+}
